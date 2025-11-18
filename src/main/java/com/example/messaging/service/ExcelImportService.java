@@ -29,23 +29,38 @@ public class ExcelImportService {
             Sheet sheet = workbook.getSheetAt(0);
             boolean headerRow = true;
             for (Row row : sheet) {
-                if (headerRow) { headerRow = false; continue; } // skip header
+                if (headerRow) { 
+                    // Validate header row
+                    if (row.getLastCellNum() < 4 || 
+                        !getCellString(row.getCell(0)).equalsIgnoreCase("Name") ||
+                        !getCellString(row.getCell(1)).equalsIgnoreCase("Phone number") ||
+                        !getCellString(row.getCell(2)).equalsIgnoreCase("Channel name") ||
+                        !getCellString(row.getCell(3)).equalsIgnoreCase("Agent Phone")) {
+                        throw new IllegalArgumentException("Invalid Excel format. Expected columns: Name, Phone number, Channel name, Agent Phone");
+                    }
+                    headerRow = false; 
+                    continue; 
+                }
+                
                 Cell nameCell = row.getCell(0);
                 Cell phoneCell = row.getCell(1);
-                Cell emailCell = row.getCell(2);
+                Cell channelCell = row.getCell(2);
+                Cell agentPhoneCell = row.getCell(3);
 
                 if (phoneCell == null) continue;
                 String phone = getCellString(phoneCell).trim();
                 if (phone.isEmpty()) continue;
 
-                String name = nameCell != null ? getCellString(nameCell) : "";
-                String email = emailCell != null ? getCellString(emailCell) : "";
+                String name = nameCell != null ? getCellString(nameCell).trim() : "";
+                String channelName = channelCell != null ? getCellString(channelCell).trim() : "";
+                String agentPhone = agentPhoneCell != null ? getCellString(agentPhoneCell).trim() : "";
 
                 Optional<Recipient> existing = recipientRepository.findByPhone(phone);
                 Recipient r = existing.orElseGet(Recipient::new);
                 r.setPhone(phone);
                 r.setName(name);
-                r.setEmail(email);
+                r.setChannelName(channelName);
+                r.setAgentPhone(agentPhone);
                 r.setImportedFrom(file.getOriginalFilename());
 
                 recipientRepository.save(r);

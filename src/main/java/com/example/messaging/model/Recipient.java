@@ -12,7 +12,8 @@ public class Recipient {
     private String name;
     @Column(unique=true)
     private String phone;
-    private String email;
+    private String channelName;
+    private String agentPhone;
     private String importedFrom;
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -29,4 +30,10 @@ public class Recipient {
     public void setImportedFrom(String importedFrom){this.importedFrom=importedFrom;}
     public LocalDateTime getCreatedAt(){return createdAt;}
     public void setCreatedAt(LocalDateTime createdAt){this.createdAt=createdAt;}
+    
+    public String getChannelName() { return channelName; }
+    public void setChannelName(String channelName) { this.channelName = channelName; }
+    
+    public String getAgentPhone() { return agentPhone; }
+    public void setAgentPhone(String agentPhone) { this.agentPhone = agentPhone; }
 }
